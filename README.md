@@ -1,6 +1,6 @@
 GifRec
 ======
-Record your screen into animated GIF. 
+Record your screen into a animated GIF. 
 
 This program is publicly available under the MIT License. See [LICENSE](http://opensource.org/licenses/MIT) for more details.
 
