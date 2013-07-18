@@ -13,7 +13,7 @@ namespace GifRec
         public static string lastUploadUrl;
         private static string ftpurl = "ftp://gifrec.uni.me/";
         private static string weburl = "http://www.gifrec.uni.me/i/";
-        private static NetworkCredential ftpcred = new NetworkCredential("appadmin@gifrec.uni.me", "OgE^)gZV!(J[");
+        private static NetworkCredential ftpcred = new NetworkCredential("FTP_USERNAME", "FTP_PASSWORD");
 
         /// <summary>
         /// Uploads file to web server
@@ -67,37 +67,4 @@ namespace GifRec
             return true;
         }
     }
-
-    //This doesn't work :-(
-
-    //public static class Imgur
-    //{
-    //    static string url = "http://api.imgur.com/3/upload.xml";
-    //    static string clientId = "";
-    //    static string secret = "";
-
-    //    public static void UploadFile(string path)
-    //    {
-    //        try
-    //        {
-    //            using (var w = new WebClient())
-    //            {
-    //                var values = new NameValueCollection {
-    //                    {
-    //                        "image", Convert.ToBase64String(File.ReadAllBytes(path))
-    //                    }
-    //                };
-
-    //                w.Headers.Add("Authorization", "Client-ID " + clientId);
-    //                byte[] response = w.UploadValues(Imgur.url, values);
-
-    //                System.Windows.Forms.MessageBox.Show(Encoding.ASCII.GetString(response));
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            Taskbar.Balloon(ex.Message, "Error uploading", System.Windows.Forms.ToolTipIcon.Error);
-    //        }
-    //    }
-    //}
 }
