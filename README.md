@@ -4,6 +4,10 @@ Record your screen into a animated GIF.
 
 This program is publicly available under the MIT License. See [LICENSE](http://opensource.org/licenses/MIT) for more details.
 
+http://www.gifrec.uni.me/
+
+[Example GIF recorded from a youtube video](http://www.gifrec.uni.me/i/ZWPLW.gif)
+
 About
 =====
 
