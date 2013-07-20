@@ -23,10 +23,10 @@ Features
  
 Currently, to record a GIF for say, 5 seconds, that is configured in the options then records for that amount in time. In future versions, users will be able to START/STOP recording at their own will instead of a fixed duration.
 
-Usage
+Compiling
 =====
 
-To use this app, you will need to head over to [Uploaders.cs](https://github.com/ben-shepherd/GifRec/blob/master/src/Uploaders.cs) and edit the FTP Url (where the file will be stored), Web Url (Url to output), Ftp username and Ftp password.
+When you compile this app, you will need to head over to [Uploaders.cs](https://github.com/ben-shepherd/GifRec/blob/master/src/Uploaders.cs) and edit the FTP Url (where the file will be stored), Web Url (Url to output), Ftp username and Ftp password.
 
 Known bugs
 =========
