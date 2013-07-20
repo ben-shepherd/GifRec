@@ -14,151 +14,138 @@ namespace GifRec
 {
     class GifRecorder
     {
-        //File paths are stored here
-        List<string> frames = new List<string>();
-
-        //Timer used to capture frames
-        Timer timer;
-
-        //Crop area
         Rectangle region;
-
-        int duration = 5; //Default duration
-        int fps = 4; //Frames per second
-        int ms = 0; //Current millisecond
-
-        string path; //GIF path
+        AnimatedGifEncoder gifEncoder;
+        int fps = 6;
+        string path;
+        bool resizeGif;
+        bool HQ; 
 
         Action<string> SetText; //Function used to notify user of updates
-        Action<bool> ToggleStart; //Used to re-enable start button
+        Action<GifSetup.StartButtonType> ChangeButton; //Used to re-enable start button
         Action StopWorking; //Tell the program it's no longer doing any work
         Action<string> SetClipboard;
 
         //Max width & height
-        const int MAX_WIDTH = 500;
-        const int MAX_HEIGHT = 500;
+        const int MAX_WIDTH = 350;
+        const int MAX_HEIGHT = 350;
 
-        public GifRecorder(Rectangle _region, Action<string> _SetText, Action<bool> _ToggleStart, Action _StopWorking, Action<string> _SetClipboard)
+        public static bool AllowRecording;
+        public static bool AllowProcessing;
+
+        public GifRecorder(Rectangle _region, Action<string> _SetText, Action<GifSetup.StartButtonType> _ToggleStart, Action _StopWorking, Action<string> _SetClipboard)
         {
             region = _region;
-            duration = int.Parse(Options.Get("duration").ToString());
-            fps = int.Parse(Options.Get("fps").ToString());
             SetText = _SetText;
-            ToggleStart = _ToggleStart;
+            ChangeButton = _ToggleStart;
             StopWorking = _StopWorking;
             SetClipboard = _SetClipboard;
-
-            //Generate random file path
-            SetPath();
-        }
-
-        public void SetPath(bool useTmp = false)
-        {
-            if (useTmp)
-            {
-                path = Path.GetTempFileName();
-            }
-            else
-            {
-                path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\GifRec\\";
-
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-
-                path += RandomString.Create(5) + ".gif";
-            }
         }
 
         public void Start()
         {
-            //Clear any frames
-            frames.Clear();
+            Options.Load();
+            resizeGif = bool.Parse(Options.Get("autoresize").ToString());
+
+            AllowRecording = AllowProcessing = true;
+            FTP.AllowUploading = true;
             
             //Set screen capture quality
-            ScreenCap.quality = ScreenCap.ImageQuality.Low;
+            HQ = bool.Parse(Options.Get("hq").ToString());
+            ScreenCap.quality = HQ ? ScreenCap.ImageQuality.High : ScreenCap.ImageQuality.Low;
 
-            //Set tmp file
-            SetPath();
+            Console.WriteLine("Resize Gif: {0}", resizeGif ? "Yes" : "No");
+            Console.WriteLine("High quality: {0}", HQ ? "Yes" : "No");
 
-            //Setup timer
-            timer = new Timer();
-            timer.Tick += new EventHandler(timer_Tick);
-            timer.Interval = 1000 / fps;
-            timer.Enabled = true;
+            //Set path file
+            path = Helper.GetRandomFile(ext: "gif");
+
+            //Setup Gif Encoder
+            gifEncoder = new AnimatedGifEncoder();
+            gifEncoder.Start(path);
+            gifEncoder.SetDelay(1000 / fps);
+            gifEncoder.SetRepeat(0);
+
+            //Tell user it is recording
+            GifSetup.SetTextMethod("Recording");
+
+            //Start recording thread
+            System.Threading.Thread recorder = new System.Threading.Thread(RecordGif);
+            recorder.Start();
         }
 
-        private void timer_Tick(object sender, EventArgs e)
+        private void RecordGif()
         {
-            //If milliseconds equals duration, then recording is complete
-            if (ms / 1000 == duration)
+            double time = 0;
+            double max = 10;
+            string tmp;
+            List<string> frameList = new List<string>();
+
+            while (AllowRecording && time / 1000 != max)
             {
-                //Disable timer
-                timer.Enabled = false;
+                //Capture frame
+                Bitmap frame = ScreenCap.CaptureArea(region);
 
-                //Notify user
-                SetText("Creating GIF");
+                //Resize if frame is too large
+                if (frame.Width > MAX_WIDTH || frame.Height > MAX_HEIGHT && resizeGif)
+                {
+                    frame = ScreenCap.Resize(frame, MAX_WIDTH, MAX_HEIGHT);
+                }
 
-                //Start generating gif
-                System.Threading.Thread genGifThread = new System.Threading.Thread(GenerateGif);
-                genGifThread.Start();
+                ////Get temp file
+                //tmp = Helper.GetRandomFile(true);
 
-                //Stop
-                return;
+                ////Save file
+                //frame.Save(tmp);
+
+                tmp = ScreenCap.SaveTmp(frame, reduceColors: HQ);
+                
+                //Add frame to collection
+                frameList.Add(tmp);
+
+                //Dispose of frame
+                frame.Dispose();
+
+                time += 1000 / fps;
+                System.Threading.Thread.Sleep(1000 / fps);
             }
 
-            //Capture frame
-            Bitmap bmp = ScreenCap.CaptureArea(region);
+            for (int i = 0; i < frameList.Count; i++)
+            {
+                if (!AllowProcessing)
+                {
+                    break;
+                }
 
-            //Resize if need to
-            bmp = ScreenCap.Resize(bmp, MAX_WIDTH, MAX_HEIGHT);
+                var perc = (i + 1) * 100 / frameList.Count;
 
-            //Save
-            string tmp = ScreenCap.SaveTmp(bmp, reduceColors: true);
+                GifSetup.SetTextMethod("Creating " + perc.ToString() + "%");
 
-            //Dispose
-            bmp.Dispose();
+                gifEncoder.AddFrame(Image.FromFile(frameList[i]));
+            }
 
-            //Add frame
-            frames.Add(tmp);
-
-            //frames.Add(ScreenCap.SaveTmp(ScreenCap.CaptureArea(region), reduceColors: true));
-
-            //Update time
-            SetText("Elapsed time " + (ms / 1000));
-            ms += 1000 / fps;
+            if (AllowProcessing)
+            {
+                gifEncoder.Finish();
+                RmFrames(frameList);
+                HandleProcessedGif();
+            }
+            else
+                GifSetup.SetTextMethod("Idle");
         }
 
-        private void GenerateGif()
+        /// <summary>
+        /// Checks user settings, uploads if user has allowed it to upload
+        /// </summary>
+        private void HandleProcessedGif()
         {
-            //NGif
-            AnimatedGifEncoder e = new AnimatedGifEncoder();
-            e.Start(path);
-            e.SetDelay(1000 / fps);
-            e.SetRepeat(0);
-
-            //Loop through and add frames, update percentage
-            for (int i = 0; i < frames.Count; i++)
+            if (bool.Parse(Options.Get("upload").ToString()))
             {
-                e.AddFrame(Image.FromFile(frames[i]));
+                Taskbar.Balloon("Uploading GIF");
 
-                var percent = (i + 1) * 100 / frames.Count;
-
-                SetText("Working... " + percent.ToString() + "%");
-            }
-            e.Finish();
-
-
-            //Update status
-            SetText("Done");
-
-            //Notify user
-            Taskbar.Balloon(path, "GIF Saved", OnClick: (Action)(() => { System.Diagnostics.Process.Start(path);  }));
-
-            if(bool.Parse(Options.Get("upload").ToString()))
-            {
                 SetText("Uploading");
 
-                if (FTP.Upload(path, SetText))
+                if (FTP.Upload(path))
                 {
                     SetClipboard(FTP.lastUploadUrl);
                     Taskbar.Balloon("Link copied to clipboard", "GifRec Uploaded");
@@ -173,15 +160,153 @@ namespace GifRec
             }
             else
             {
+                //Notify user
+                Taskbar.Balloon(path, "GIF Saved", OnClick: (Action)(() => { System.Diagnostics.Process.Start(path); }));
+
                 if (bool.Parse(Options.Get("openafter").ToString()))
                     System.Diagnostics.Process.Start(path);
             }
 
-            //Set isWorking to false
-            StopWorking();
-
             //Turn start button back on
-            ToggleStart(true);
+            ChangeButton(GifSetup.StartButtonType.Start);
+            GifSetup.SetTextMethod("Idle");
         }
+
+        /// <summary>
+        /// Deletes stored framed files from the computer
+        /// </summary>
+        private void RmFrames(List<string> frames)
+        {
+            for (int i = 0; i < frames.Count; i++)
+            {
+                try
+                {
+                    File.Delete(frames[i]);
+                }
+                catch
+                {
+                    //Do nothing
+                }
+            }
+
+            frames.Clear();
+        }
+
+        #region Old code
+        //private void timer_Tick(object sender, EventArgs e)
+        //{
+        //    //Stop adding frames if the second count equals 10, or the user has pressed the "Stop" button
+        //    if (!AllowRecording || ms / 1000 == 10)
+        //    {
+        //        //Save gif
+        //        gifEncoder.Finish();
+
+        //        //Disable timer
+        //        timer.Enabled = false;
+
+        //        ////Notify user
+        //        //SetText("Creating GIF");
+
+        //        //Start generating gif
+        //        //System.Threading.Thread genGifThread = new System.Threading.Thread(GenerateGif);
+        //        //genGifThread.Start();
+
+        //        HandleProcessedGif();
+
+        //        //Stop
+        //        return;
+        //    }
+
+        //    //Capture frame
+        //    using (Bitmap bmp = ScreenCap.Resize(ScreenCap.CaptureArea(region), MAX_WIDTH, MAX_HEIGHT))
+        //    {
+        //        //Save
+        //        //string tmp = ScreenCap.SaveTmp(bmp, reduceColors: true);
+
+        //        gifEncoder.AddFrame(bmp);
+        //    }
+
+        //    //Add frame
+        //    //frames.Add(tmp);
+
+        //    //frames.Add(ScreenCap.SaveTmp(ScreenCap.CaptureArea(region), reduceColors: true));
+
+        //    //Update time
+        //    SetText("Recording");
+        //    ms += 1000 / fps;
+        //}
+
+        //private void GenerateGif()
+        //{
+        //    AllowProcessing = true;
+
+        //    //NGif
+        //    AnimatedGifEncoder e = new AnimatedGifEncoder();
+        //    e.Start(path);
+        //    e.SetDelay(1000 / fps);
+        //    e.SetRepeat(0);
+
+        //    //Loop through and add frames, update percentage
+        //    for (int i = 0; i < frames.Count; i++)
+        //    {
+        //        if (AllowProcessing)
+        //        {
+        //            e.AddFrame(Image.FromFile(frames[i]));
+
+        //            var percent = (i + 1) * 100 / frames.Count;
+
+        //            SetText("Working... " + percent.ToString() + "%");
+        //        }
+        //        else
+        //            break;
+        //    }
+        //    e.Finish();
+
+        //    System.Threading.Thread delTmpFramesThread = new System.Threading.Thread(RmFrames);
+        //    delTmpFramesThread.Start();
+
+        //    if (!AllowProcessing)
+        //    {
+        //        SetText("Idle");
+        //        return;
+        //    }
+
+
+        //    //Update status
+        //    SetText("Done");
+
+        //    //Notify user
+        //    Taskbar.Balloon(path, "GIF Saved", OnClick: (Action)(() => { System.Diagnostics.Process.Start(path);  }));
+
+        //    if(bool.Parse(Options.Get("upload").ToString()))
+        //    {
+        //        SetText("Uploading");
+
+        //        if (FTP.Upload(path))
+        //        {
+        //            SetClipboard(FTP.lastUploadUrl);
+        //            Taskbar.Balloon("Link copied to clipboard", "GifRec Uploaded");
+
+        //            if (bool.Parse(Options.Get("openafter").ToString()))
+        //            {
+        //                System.Diagnostics.Process.Start(FTP.lastUploadUrl);
+        //            }
+        //        }
+
+        //        SetText("Idle");
+        //    }
+        //    else
+        //    {
+        //        if (bool.Parse(Options.Get("openafter").ToString()))
+        //            System.Diagnostics.Process.Start(path);
+        //    }
+
+        //    //Set isWorking to false
+        //    StopWorking();
+
+        //    //Turn start button back on
+        //    ChangeButton(GifSetup.StartButtonType.Start);
+        //}
+        #endregion
     }
 }

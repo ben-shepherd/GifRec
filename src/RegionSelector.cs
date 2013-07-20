@@ -29,11 +29,11 @@ namespace GifRec
 
         Image background;
 
-        public RegionSelector()
+        public RegionSelector(Bitmap bg = null)
         {
             InitializeComponent();
 
-            background = (Image)ScreenCap.Fullscreen();
+            background = bg != null ? (Image)bg : (Image)ScreenCap.Fullscreen();
             picBox.MouseDown += new MouseEventHandler(picBox_MouseDown);
             picBox.MouseUp += new MouseEventHandler(picBox_MouseUp);
             picBox.MouseMove += new MouseEventHandler(picBox_MouseMove);

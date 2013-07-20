@@ -41,10 +41,10 @@ namespace GifRec
         private void Main_Load(object sender, EventArgs e)
         {
             //Set option defaults
-            Options.Set("duration", 5, true);
             Options.Set("openafter", true, true);
             Options.Set("upload", true, true);
-            Options.Set("fps", 10, true);
+            Options.Set("autoresize", true, true);
+            Options.Set("hq", false, true);
 
             //Load user options
             Options.Load();

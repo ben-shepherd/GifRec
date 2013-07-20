@@ -65,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CaptureMethods.cs" />
     <Compile Include="FormDraggable.cs" />
     <Compile Include="GifRecorder.cs" />
     <Compile Include="GifSetup.cs">
@@ -73,7 +74,7 @@
     <Compile Include="GifSetup.Designer.cs">
       <DependentUpon>GifSetup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Uploaders.cs" />
+    <Compile Include="FTP.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,7 +84,7 @@
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomString.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="RegionSelector.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -180,6 +181,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\checkboxDisabled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\buttonCancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\buttonStop.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -29,7 +29,7 @@ namespace GifRec
         /// <param name="_icon"></param>
         /// <param name="duration"></param>
         /// <param name="OnClick"></param>
-        public static void Balloon(string text, string title, ToolTipIcon _icon = ToolTipIcon.Info, int duration = 3000, Action OnClick = null)
+        public static void Balloon(string text, string title = "GifRec", ToolTipIcon _icon = ToolTipIcon.Info, int duration = 3000, Action OnClick = null)
         {
             if (icon != null)
             {
@@ -63,6 +63,19 @@ namespace GifRec
                     OpenGifMain();
                 }
             };
+            menu.MenuItems.Add("-");
+            menu.MenuItems.Add("Capture fullscreen").Click += (s, e) =>
+                {
+                    CaptureMethods.Fullscreen();
+                };
+            menu.MenuItems.Add("Capture area").Click += (s, e) =>
+                {
+                    CaptureMethods.Area();
+                };
+            menu.MenuItems.Add("Upload from computer").Click += (s, e) =>
+                {
+                    CaptureMethods.FromComputer();
+                };
             menu.MenuItems.Add("-");
             menu.MenuItems.Add("Exit").Click += (s, e) =>
             {

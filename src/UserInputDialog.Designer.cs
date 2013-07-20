@@ -29,8 +29,6 @@
         private void InitializeComponent()
         {
             this.picOK = new System.Windows.Forms.PictureBox();
-            this.txtTime = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.linkExit = new System.Windows.Forms.LinkLabel();
@@ -46,7 +44,7 @@
             this.picOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.picOK.BackColor = System.Drawing.Color.Transparent;
             this.picOK.Image = global::GifRec.Properties.Resources.button4;
-            this.picOK.Location = new System.Drawing.Point(435, 305);
+            this.picOK.Location = new System.Drawing.Point(435, 217);
             this.picOK.Margin = new System.Windows.Forms.Padding(7);
             this.picOK.Name = "picOK";
             this.picOK.Size = new System.Drawing.Size(149, 51);
@@ -54,37 +52,13 @@
             this.picOK.TabStop = false;
             this.picOK.Click += new System.EventHandler(this.picOK_Click);
             // 
-            // txtTime
-            // 
-            this.txtTime.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTime.Location = new System.Drawing.Point(32, 120);
-            this.txtTime.Margin = new System.Windows.Forms.Padding(7);
-            this.txtTime.MaxLength = 2;
-            this.txtTime.Name = "txtTime";
-            this.txtTime.Size = new System.Drawing.Size(308, 35);
-            this.txtTime.TabIndex = 6;
-            this.txtTime.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
-            // 
-            // label1
-            // 
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(27, 79);
-            this.label1.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(436, 34);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "Recording Duration: (Seconds)";
-            // 
             // label2
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.BackColor = System.Drawing.Color.Transparent;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(96, 187);
+            this.label2.Location = new System.Drawing.Point(87, 88);
             this.label2.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(436, 34);
@@ -97,12 +71,12 @@
             this.label3.BackColor = System.Drawing.Color.Transparent;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(96, 261);
+            this.label3.Location = new System.Drawing.Point(87, 162);
             this.label3.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(436, 34);
             this.label3.TabIndex = 11;
-            this.label3.Text = "Upload to Web (In development)";
+            this.label3.Text = "Upload to Web";
             // 
             // linkExit
             // 
@@ -125,7 +99,7 @@
             this.pbcbUploadWeb.Checked = false;
             this.pbcbUploadWeb.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbcbUploadWeb.Image = global::GifRec.Properties.Resources.checkboxNormal;
-            this.pbcbUploadWeb.Location = new System.Drawing.Point(32, 252);
+            this.pbcbUploadWeb.Location = new System.Drawing.Point(23, 153);
             this.pbcbUploadWeb.Margin = new System.Windows.Forms.Padding(7);
             this.pbcbUploadWeb.Name = "pbcbUploadWeb";
             this.pbcbUploadWeb.Size = new System.Drawing.Size(50, 50);
@@ -138,7 +112,7 @@
             this.pbcbOpenAfter.Checked = false;
             this.pbcbOpenAfter.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbcbOpenAfter.Image = global::GifRec.Properties.Resources.checkboxNormal;
-            this.pbcbOpenAfter.Location = new System.Drawing.Point(32, 178);
+            this.pbcbOpenAfter.Location = new System.Drawing.Point(23, 79);
             this.pbcbOpenAfter.Margin = new System.Windows.Forms.Padding(7);
             this.pbcbOpenAfter.Name = "pbcbOpenAfter";
             this.pbcbOpenAfter.Size = new System.Drawing.Size(50, 50);
@@ -152,14 +126,12 @@
             this.BackColor = System.Drawing.Color.Black;
             this.BackgroundImage = global::GifRec.Properties.Resources.backgroundOptions;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(600, 372);
+            this.ClientSize = new System.Drawing.Size(600, 284);
             this.Controls.Add(this.linkExit);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.pbcbUploadWeb);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.pbcbOpenAfter);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtTime);
             this.Controls.Add(this.picOK);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -181,8 +153,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox picOK;
-        private System.Windows.Forms.TextBox txtTime;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
 

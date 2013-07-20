@@ -119,42 +119,51 @@ namespace GifRec
             return file;
         }
 
-        public static Bitmap Resize(Bitmap bmp, double maxWidth, double maxHeight)
+        public static Bitmap Resize(Bitmap img, double maxWidth, double maxHeight)
         {
-            double srcWidth = bmp.Width;
-            double srcHeight = bmp.Height;
+            double resizeWidth = img.Width;
+            double resizeHeight = img.Height;
+            double ratio = resizeWidth / resizeHeight;
 
-            double resWidth = srcWidth;
-            double resHeight = srcHeight;
-
-            double aspect = srcWidth / srcHeight;
-            bool mkNewImg = false;
-
-            if (srcWidth > maxWidth)
+            if (resizeWidth > maxWidth)
             {
-                resWidth = maxWidth;
-                resHeight = resWidth / aspect;
-                mkNewImg = true;
-
+                resizeWidth = maxWidth;
+                resizeHeight = resizeWidth / ratio;
             }
-            if (srcHeight > maxHeight)
+            if (resizeHeight > maxHeight)
             {
-                resHeight = maxHeight;
-                resWidth = resHeight * aspect;
-                mkNewImg = true;
+                ratio = resizeWidth / resizeHeight;
+                resizeHeight = maxHeight;
+                resizeWidth = resizeHeight * ratio;
             }
 
-            if (!mkNewImg)
-                return bmp;
-
-            Bitmap newImg = new Bitmap((int)resWidth, (int)resHeight);
-
-            using (Graphics g = Graphics.FromImage(newImg))
-            {
-                g.DrawImage(bmp, 0, 0, (int)resWidth, (int)resHeight);
-            }
-
-            return newImg;
+            return new Bitmap(img, new Size((int)resizeWidth, (int)resizeHeight));
         }
+
+        //public static Bitmap Resize(Bitmap bmp, double maxHeight)
+        //{
+        //    double srcWidth = bmp.Width;
+        //    double srcHeight = bmp.Height;
+
+        //    double resWidth = srcWidth;
+        //    double resHeight = srcHeight;
+
+        //    double aspect = srcWidth / srcHeight;
+        //    Bitmap newImg = null;
+
+        //    if (srcHeight > maxHeight)
+        //    {
+        //        resHeight = maxHeight;
+        //        resWidth = resHeight * aspect;
+                
+        //        newImg = new Bitmap((int)resWidth, (int)resHeight);
+        //        using (Graphics g = Graphics.FromImage(newImg))
+        //        {
+        //            g.DrawImage(bmp, 0, 0, (int)resWidth, (int)resHeight);
+        //        }
+        //    }
+
+        //    return newImg != null ? newImg : bmp;
+        //}
     }
 }

@@ -14,7 +14,11 @@ namespace GifRec
     {
         FormDraggable draggable;
         Rectangle region = Rectangle.Empty;
-        bool isWorking = false;
+        StartButtonType buttonType; //Start/stop/cancel/disabled button
+
+        //Methods used across classes
+        public static Action<string> SetTextMethod;
+        public static Action<StartButtonType> ChangeButtonMethod;
 
         /// <summary>
         /// Check if requirements are met to start gif, enable button if so
@@ -23,10 +27,18 @@ namespace GifRec
         public GifSetup()
         {
             InitializeComponent();
-
             draggable = new FormDraggable(this);
 
-            DoDurationRegionCheck();
+            SetTextMethod = SetText;
+            ChangeButtonMethod = ChangeButton;
+        }
+
+        public enum StartButtonType
+        {
+            Start,
+            StartDisabled,
+            Stop,
+            Cancel
         }
 
         /// <summary>
@@ -43,13 +55,16 @@ namespace GifRec
             this.Icon = Properties.Resources.favicon;
 
             //Set hover cursor state for image buttons
-            picBtnRegion.Cursor = picBtnStart.Cursor = picBtnTime.Cursor = Cursors.Hand;
+            picBtnRegion.Cursor = picBtnStart.Cursor = picBtnOptions.Cursor = Cursors.Hand;
 
             //Disable start button
-            ToggleStart(false);
+            ChangeButton(StartButtonType.StartDisabled);
 
-            //Set record time
-            labelTime.Text = "Record time: " + Options.Get("duration").ToString();
+            //Auto resize option
+            cbAutoResize.Checked = bool.Parse(Options.Get("autoresize").ToString());
+
+            //High quality option
+            cbHq.Checked = bool.Parse(Options.Get("hq").ToString());
         }
 
         /// <summary>
@@ -66,31 +81,11 @@ namespace GifRec
                     if (rs.SelectedRegion)
                     {
                         region = rs.Region;
-
-                        DoDurationRegionCheck();
+                        ChangeButton(StartButtonType.Start);
                     }
                 };
 
             rs.Show();
-        }
-
-        /// <summary>
-        /// Set duration button
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void picBtnTime_Click(object sender, EventArgs e)
-        {
-            UserInputDialog form = new UserInputDialog();
-
-            form.FormClosing += (s, _e) =>
-                {
-                    labelTime.Text = "Record time: " + Options.Get("duration").ToString();
-
-                    DoDurationRegionCheck();
-                };
-
-            form.ShowDialog(this);
         }
 
         /// <summary>
@@ -100,13 +95,28 @@ namespace GifRec
         /// <param name="e"></param>
         private void picBtnStart_Click(object sender, EventArgs e)
         {
-            if (!isWorking)
+            if (buttonType == StartButtonType.Start)
             {
-                isWorking = false;
-                GifRecorder gf = new GifRecorder(region, SetText, ToggleStart, StopWorking, SetClipboard);
+                GifRecorder gf = new GifRecorder(region, SetText, ChangeButton, StopWorking, SetClipboard);
 
-                ToggleStart(false);
+                ChangeButton(StartButtonType.Stop);
                 gf.Start();
+
+            }
+            else if (buttonType == StartButtonType.Stop)
+            {
+                GifRecorder.AllowRecording = false;
+
+                ChangeButton(StartButtonType.Cancel);
+                SetText();
+            }
+            else if (buttonType == StartButtonType.Cancel)
+            {
+                FTP.AllowUploading = false;
+                GifRecorder.AllowProcessing = false;
+
+                ChangeButton(StartButtonType.Start);
+                SetText();
             }
         }
 
@@ -127,17 +137,19 @@ namespace GifRec
         /// </summary>
         private void StopWorking()
         {
-            isWorking = false;
+            //isWorking = false;
         }
 
         /// <summary>
         /// Checks if the user has selected a region
         /// Enable start button if true
         /// </summary>
-        private void DoDurationRegionCheck()
+        private bool isStartButtonAllowed()
         {
-            if (region != Rectangle.Empty)
-                ToggleStart(true);
+            if (region == Rectangle.Empty)
+                return false;
+
+            return true;
         }
 
         /// <summary>
@@ -145,7 +157,7 @@ namespace GifRec
         /// </summary>
         /// <param name="text"></param>
         delegate void SetStatusDelegate(string text);
-        private void SetText(string text)
+        private void SetText(string text = "Idle")
         {
             if(InvokeRequired)
                 Invoke(new SetStatusDelegate(SetText), text);
@@ -156,30 +168,52 @@ namespace GifRec
         }
 
         /// <summary>
-        /// Enables/Disables "Start" button
+        /// Changes the start button type
         /// </summary>
-        /// <param name="active"></param>
-        delegate void ToggleStartDelegate(bool active);
-        bool startBtnActive = false;
-        private void ToggleStart(bool active)
+        /// <param name="type"></param>
+        delegate void ChangeButtonDelegate(StartButtonType type);
+        private void ChangeButton(StartButtonType type)
         {
             if (InvokeRequired)
-                Invoke(new ToggleStartDelegate(ToggleStart), active);
+                Invoke(new ChangeButtonDelegate(ChangeButton), type);
             else
             {
-                if (active)
+                switch (type.ToString().ToLower())
                 {
-                    picBtnStart.Image = Properties.Resources.button3;
-                    picBtnStart.Cursor = Cursors.Hand;
-                }
-                else
-                {
-                    picBtnStart.Image = Properties.Resources.button3_2;
-                    picBtnStart.Cursor = Cursors.Arrow;
-                }
-            }
+                    case "start":
 
-            startBtnActive = active;
+                        if (isStartButtonAllowed())
+                        {
+                            picBtnStart.Image = Properties.Resources.buttonStart;
+                            buttonType = StartButtonType.Start;
+                        }
+
+                        break;
+                    case "stop":
+
+                        picBtnStart.Image = Properties.Resources.buttonStop;
+                        buttonType = StartButtonType.Stop;
+
+                        break;
+                    case "cancel":
+
+                        picBtnStart.Image = Properties.Resources.buttonCancel;
+                        buttonType = StartButtonType.Cancel;
+
+                        break;
+                    case "startdisabled":
+
+                        picBtnStart.Image = Properties.Resources.buttonStartDisabled;
+                        buttonType = StartButtonType.StartDisabled;
+
+                        break;
+                }
+
+                if (buttonType == StartButtonType.StartDisabled)
+                    picBtnStart.Cursor = Cursors.Arrow;
+                else
+                    picBtnStart.Cursor = Cursors.Hand;
+            }
         }
 
         /// <summary>
@@ -202,6 +236,35 @@ namespace GifRec
             Taskbar.GifSetShowing = false;
             Taskbar.RunningInBackground();
             this.Close();
+        }
+
+        /// <summary>
+        /// Open the user options form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void picBtnOptions_Click(object sender, EventArgs e)
+        {
+            UserInputDialog form = new UserInputDialog();
+
+            form.FormClosing += (s, _e) =>
+            {
+                ChangeButton(StartButtonType.Start);
+            };
+
+            form.ShowDialog(this);
+        }
+
+        private void cbAutoResize_Click(object sender, EventArgs e)
+        {
+            Options.Set("autoresize", cbAutoResize.Checked);
+            Options.Save();
+        }
+
+        private void cbHq_Click(object sender, EventArgs e)
+        {
+            Options.Set("hq", cbHq.Checked);
+            Options.Save();
         }
     }
 }

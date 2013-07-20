@@ -23,8 +23,6 @@ namespace GifRec
             //Hover cursor
             picOK.Cursor = Cursors.Hand;
 
-            //Disable web upload box
-            //pbcbUploadWeb.Enabled = false;
         }
 
         //Exit button
@@ -36,20 +34,7 @@ namespace GifRec
         //OK Button
         private void picOK_Click(object sender, EventArgs e)
         {
-            //Validation
-            if (txtTime.Text.Length == 0)
-            {
-                MessageBox.Show("Record time cannot be empty!");
-                return;
-            }
-            if (int.Parse(txtTime.Text) > 30)
-            {
-                MessageBox.Show("Record time cannot be larger than 30 seconds");
-                return;
-            }
-
             //Set options
-            Options.Set("duration", txtTime.Text);
             Options.Set("openafter", pbcbOpenAfter.Checked);
             Options.Set("upload", pbcbUploadWeb.Checked);
 
@@ -59,21 +44,6 @@ namespace GifRec
             this.Close();
         }
 
-        //TextChange for record duration
-        string lastText = null;
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-            int duration; //only used to test parse
-
-            if (!int.TryParse(txtTime.Text, out duration))
-            {
-                if (lastText == null)
-                    lastText = "5";
-
-                txtTime.Text = lastText;
-            }
-        }
-
         //Form load
         private void UserInputDialog_Load(object sender, EventArgs e)
         {
@@ -81,9 +51,6 @@ namespace GifRec
             Options.Load();
 
             bool openAfter, uploadWeb;
-
-            //Time duration
-            txtTime.Text = Options.Get("duration").ToString();
 
             //Open after created
             bool.TryParse(Options.Get("openafter").ToString(), out openAfter);
@@ -100,6 +67,9 @@ namespace GifRec
         }
     }
 
+    /// <summary>
+    /// PictureBox turned into a custom checkbox
+    /// </summary>
     public class Checkbox : PictureBox
     {
         private bool isChecked = false;

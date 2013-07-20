@@ -29,14 +29,15 @@
         private void InitializeComponent()
         {
             this.picBtnRegion = new System.Windows.Forms.PictureBox();
-            this.picBtnTime = new System.Windows.Forms.PictureBox();
+            this.picBtnOptions = new System.Windows.Forms.PictureBox();
             this.picBtnStart = new System.Windows.Forms.PictureBox();
             this.labelStatus = new System.Windows.Forms.Label();
-            this.labelTime = new System.Windows.Forms.Label();
             this.linkExit = new System.Windows.Forms.LinkLabel();
             this.linkMinimize = new System.Windows.Forms.LinkLabel();
+            this.cbAutoResize = new System.Windows.Forms.CheckBox();
+            this.cbHq = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picBtnRegion)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picBtnTime)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBtnOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBtnStart)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,21 +52,21 @@
             this.picBtnRegion.TabStop = false;
             this.picBtnRegion.Click += new System.EventHandler(this.picBtnRegion_Click);
             // 
-            // picBtnTime
+            // picBtnOptions
             // 
-            this.picBtnTime.BackColor = System.Drawing.Color.Transparent;
-            this.picBtnTime.Image = global::GifRec.Properties.Resources.buttonOptions;
-            this.picBtnTime.Location = new System.Drawing.Point(52, 190);
-            this.picBtnTime.Name = "picBtnTime";
-            this.picBtnTime.Size = new System.Drawing.Size(149, 50);
-            this.picBtnTime.TabIndex = 1;
-            this.picBtnTime.TabStop = false;
-            this.picBtnTime.Click += new System.EventHandler(this.picBtnTime_Click);
+            this.picBtnOptions.BackColor = System.Drawing.Color.Transparent;
+            this.picBtnOptions.Image = global::GifRec.Properties.Resources.buttonOptions;
+            this.picBtnOptions.Location = new System.Drawing.Point(52, 190);
+            this.picBtnOptions.Name = "picBtnOptions";
+            this.picBtnOptions.Size = new System.Drawing.Size(149, 50);
+            this.picBtnOptions.TabIndex = 1;
+            this.picBtnOptions.TabStop = false;
+            this.picBtnOptions.Click += new System.EventHandler(this.picBtnOptions_Click);
             // 
             // picBtnStart
             // 
             this.picBtnStart.BackColor = System.Drawing.Color.Transparent;
-            this.picBtnStart.Image = global::GifRec.Properties.Resources.button3_2;
+            this.picBtnStart.Image = global::GifRec.Properties.Resources.buttonStartDisabled;
             this.picBtnStart.Location = new System.Drawing.Point(207, 130);
             this.picBtnStart.Name = "picBtnStart";
             this.picBtnStart.Size = new System.Drawing.Size(149, 50);
@@ -83,17 +84,6 @@
             this.labelStatus.Size = new System.Drawing.Size(60, 13);
             this.labelStatus.TabIndex = 4;
             this.labelStatus.Text = "Status: Idle";
-            // 
-            // labelTime
-            // 
-            this.labelTime.AutoSize = true;
-            this.labelTime.BackColor = System.Drawing.Color.Transparent;
-            this.labelTime.ForeColor = System.Drawing.Color.White;
-            this.labelTime.Location = new System.Drawing.Point(207, 209);
-            this.labelTime.Name = "labelTime";
-            this.labelTime.Size = new System.Drawing.Size(67, 13);
-            this.labelTime.TabIndex = 5;
-            this.labelTime.Text = "Record time:";
             // 
             // linkExit
             // 
@@ -127,6 +117,32 @@
             this.linkMinimize.Text = "_";
             this.linkMinimize.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkMinimize_LinkClicked);
             // 
+            // cbAutoResize
+            // 
+            this.cbAutoResize.AutoSize = true;
+            this.cbAutoResize.BackColor = System.Drawing.Color.Transparent;
+            this.cbAutoResize.ForeColor = System.Drawing.Color.White;
+            this.cbAutoResize.Location = new System.Drawing.Point(210, 205);
+            this.cbAutoResize.Name = "cbAutoResize";
+            this.cbAutoResize.Size = new System.Drawing.Size(103, 17);
+            this.cbAutoResize.TabIndex = 8;
+            this.cbAutoResize.Text = "Auto Resize GIF";
+            this.cbAutoResize.UseVisualStyleBackColor = false;
+            this.cbAutoResize.Click += new System.EventHandler(this.cbAutoResize_Click);
+            // 
+            // cbHq
+            // 
+            this.cbHq.AutoSize = true;
+            this.cbHq.BackColor = System.Drawing.Color.Transparent;
+            this.cbHq.ForeColor = System.Drawing.Color.White;
+            this.cbHq.Location = new System.Drawing.Point(210, 223);
+            this.cbHq.Name = "cbHq";
+            this.cbHq.Size = new System.Drawing.Size(83, 17);
+            this.cbHq.TabIndex = 9;
+            this.cbHq.Text = "High Quality";
+            this.cbHq.UseVisualStyleBackColor = false;
+            this.cbHq.Click += new System.EventHandler(this.cbHq_Click);
+            // 
             // GifSetup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -134,19 +150,20 @@
             this.BackgroundImage = global::GifRec.Properties.Resources.background;
             this.ClientSize = new System.Drawing.Size(384, 262);
             this.ControlBox = false;
+            this.Controls.Add(this.cbHq);
+            this.Controls.Add(this.cbAutoResize);
             this.Controls.Add(this.linkMinimize);
             this.Controls.Add(this.linkExit);
-            this.Controls.Add(this.labelTime);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.picBtnStart);
-            this.Controls.Add(this.picBtnTime);
+            this.Controls.Add(this.picBtnOptions);
             this.Controls.Add(this.picBtnRegion);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "GifSetup";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.GifSetup_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picBtnRegion)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picBtnTime)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picBtnOptions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picBtnStart)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -156,12 +173,13 @@
         #endregion
 
         private System.Windows.Forms.PictureBox picBtnRegion;
-        private System.Windows.Forms.PictureBox picBtnTime;
+        private System.Windows.Forms.PictureBox picBtnOptions;
         private System.Windows.Forms.PictureBox picBtnStart;
         private System.Windows.Forms.Label labelStatus;
-        private System.Windows.Forms.Label labelTime;
         private System.Windows.Forms.LinkLabel linkExit;
         private System.Windows.Forms.LinkLabel linkMinimize;
+        private System.Windows.Forms.CheckBox cbAutoResize;
+        private System.Windows.Forms.CheckBox cbHq;
 
     }
 }
